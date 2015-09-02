@@ -112,11 +112,10 @@ namespace Moodle
 				Program.AskUser("\nRoll No  : ", false);
 				string userName = Console.ReadLine();
 				Program.AskUser("Password : ", false);
-				string password = Utils.SecureStringToString(Utils.GetPassword());
+				string password = Utils.GetStringPassword();
 				Program.ConsoleSetColor(ConsoleColor.Cyan);
 				loginResponse = Program.LoginToMoodle(userName, password);
-			}
-			while (loginResponse.Content.Contains("Invalid login, please try again"));
+			} while (loginResponse.Content.Contains("Invalid login, please try again"));
 			Console.WriteLine("\n");
 			HtmlDocument homeDocument = new HtmlDocument();
 			homeDocument.Load(Utils.GenerateStreamFromString(loginResponse.Content));

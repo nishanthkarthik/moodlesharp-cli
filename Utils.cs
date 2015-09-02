@@ -2,22 +2,25 @@ using System;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Security;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 
 namespace Moodle
 {
 	internal static class Utils
 	{
-		public static Stream GenerateStreamFromString(string s)
+		public static Stream GenerateStreamFromString (string s)
 		{
-			MemoryStream stream = new MemoryStream();
-			StreamWriter writer = new StreamWriter(stream);
-			writer.Write(s);
-			writer.Flush();
+			MemoryStream stream = new MemoryStream ();
+			StreamWriter writer = new StreamWriter (stream);
+			writer.Write (s);
+			writer.Flush ();
 			stream.Position = (long)0;
 			return stream;
 		}
 
-		public static SecureString GetPassword()
+		public static SecureString GetPassword ()
 		{
 			using (SecureString _pwd = new SecureString ())
 			{
@@ -32,30 +35,52 @@ namespace Moodle
 					{
 						_pwd.AppendChar (i.KeyChar);
 						Console.Write ("*");
+					} else if (_pwd.Length > 0)
+					{
+						_pwd.RemoveAt (_pwd.Length - 1);
+						Console.Write ("\b \b");
 					}
-					else
-						if (_pwd.Length > 0)
-						{
-							_pwd.RemoveAt (_pwd.Length - 1);
-							Console.Write ("\b \b");
-						}
 				}
 				return _pwd;
 			}
 		}
 
-		public static string SecureStringToString(SecureString value)
+		public static string GetStringPassword ()
+		{
+			StringBuilder _pwd = new StringBuilder ();
+
+			while (true)
+			{
+				ConsoleKeyInfo i = Console.ReadKey (true);
+				if (i.Key == ConsoleKey.Enter)
+				{
+					break;
+				}
+				if (i.Key != ConsoleKey.Backspace)
+				{
+					_pwd.Append (i.KeyChar);
+					Console.Write ("*");
+				} else if (_pwd.Length > 0)
+				{
+					_pwd.Remove (_pwd.Length - 1, 1);
+					Console.Write ("\b \b");
+				}
+			}
+			return _pwd.ToString ();
+
+		}
+
+		public static string SecureStringToString (SecureString value)
 		{
 			string stringUni;
 			IntPtr valuePtr = IntPtr.Zero;
 			try
 			{
-				valuePtr = Marshal.SecureStringToGlobalAllocUnicode(value);
-				stringUni = Marshal.PtrToStringUni(valuePtr);
-			}
-			finally
+				valuePtr = Marshal.SecureStringToGlobalAllocUnicode (value);
+				stringUni = Marshal.PtrToStringUni (valuePtr);
+			} finally
 			{
-				Marshal.ZeroFreeGlobalAllocUnicode(valuePtr);
+				Marshal.ZeroFreeGlobalAllocUnicode (valuePtr);
 			}
 			return stringUni;
 		}
