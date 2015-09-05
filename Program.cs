@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net;
 using HtmlAgilityPack;
 using RestSharp;
+using RestSharp.Extensions.MonoHttp;
 
 namespace Moodle
 {
@@ -53,9 +54,9 @@ namespace Moodle
 				tempFilePath = string.Concat(tempFilePath, uri.Segments.Last<string>());
 				WebClient webClient = new WebClient();
 				webClient.Headers.Add(HttpRequestHeader.Cookie, string.Concat(loginResponse.Cookies[0].Name, "=", loginResponse.Cookies[0].Value));
-				webClient.DownloadFile(uri, tempFilePath);
+				webClient.DownloadFile(uri, HttpUtility.UrlDecode(tempFilePath));
 				Program.ConsoleSetColor(ConsoleColor.Gray);
-				Console.WriteLine(string.Concat(uri.Segments.Last<string>(), " complete"));
+				Console.WriteLine(HttpUtility.UrlDecode(string.Concat(uri.Segments.Last<string>(), " complete")));
 			}
 		}
 
@@ -127,7 +128,7 @@ namespace Moodle
 				Console.Write(i + 1);
 				Console.Write(") ");
 				Program.ConsoleSetColor(ConsoleColor.White);
-				Console.WriteLine(keyValuePair.Key);
+				Console.WriteLine(HttpUtility.HtmlDecode(keyValuePair.Key));
 				i++;
 			}
 			Program.AskUser("\nChoose a course for bulk downloading course contents -> ", false);
