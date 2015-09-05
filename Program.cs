@@ -54,7 +54,7 @@ namespace Moodle
 				tempFilePath = string.Concat(tempFilePath, uri.Segments.Last<string>());
 				WebClient webClient = new WebClient();
 				webClient.Headers.Add(HttpRequestHeader.Cookie, string.Concat(loginResponse.Cookies[0].Name, "=", loginResponse.Cookies[0].Value));
-				webClient.DownloadFile(uri, HttpUtility.UrlDecode(tempFilePath));
+				webClient.DownloadFile(uri, HttpUtility.HtmlDecode(HttpUtility.UrlDecode(tempFilePath)));
 				Program.ConsoleSetColor(ConsoleColor.Gray);
 				Console.WriteLine(HttpUtility.UrlDecode(string.Concat(uri.Segments.Last<string>(), " complete")));
 			}
