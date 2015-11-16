@@ -6,6 +6,7 @@ using System.Net;
 using HtmlAgilityPack;
 using RestSharp;
 using RestSharp.Extensions.MonoHttp;
+using System.Text.RegularExpressions;
 
 namespace Moodle
 {
@@ -35,9 +36,13 @@ namespace Moodle
 		{
 			string filePath;
 			Console.WriteLine("");
+			//Regex setup for removing multiple spaces
+			RegexOptions options = RegexOptions.None;
+			Regex regex = new Regex(@"[ ]{2,}", options); 
+
 			if (chosenFolderName == string.Empty)
 			{
-				filePath = string.Concat(chosenFilePath, "\\");
+				filePath = string.Concat(chosenFilePath, "");
 			}
 			else
 			{
@@ -54,11 +59,12 @@ namespace Moodle
 				tempFilePath = string.Concat(tempFilePath, uri.Segments.Last<string>());
 				WebClient webClient = new WebClient();
 				webClient.Headers.Add(HttpRequestHeader.Cookie, string.Concat(loginResponse.Cookies[0].Name, "=", loginResponse.Cookies[0].Value));
-				webClient.DownloadFile(uri, HttpUtility.HtmlDecode(HttpUtility.UrlDecode(tempFilePath)));
+				webClient.DownloadFile(uri, regex.Replace(HttpUtility.HtmlDecode(HttpUtility.UrlDecode(tempFilePath)),@" "));
 				Program.ConsoleSetColor(ConsoleColor.Gray);
 				Console.WriteLine(HttpUtility.UrlDecode(string.Concat(uri.Segments.Last<string>(), " complete")));
 			}
 		}
+			
 
 		static Dictionary<string, string> GetDownloadUrl(IRestResponse loginResponse, Dictionary<string, string> courseDictionary, int courseKeyValuePairIndex)
 		{
@@ -136,7 +142,7 @@ namespace Moodle
 			chosenCourseIndex--;
 			Program.ConsoleSetColor(ConsoleColor.Cyan);
 			KeyValuePair<string, string> keyValuePair1 = courseDictionary.ElementAt<KeyValuePair<string, string>>(chosenCourseIndex);
-			Program.AskUser(string.Concat("You have chosen ", keyValuePair1.Key), true);
+			Program.AskUser(string.Concat("You have chosen ", HttpUtility.HtmlDecode(keyValuePair1.Key)), true);
 			Console.WriteLine("");
 			Program.AskUser("Enter the folder path for download -> ", false);
 			string chosenFilePath = Console.ReadLine();
